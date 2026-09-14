@@ -157,6 +157,27 @@ npm run build
 
 No Open-Meteo API key is required for the default weather integration.
 
+## Deploy the frontend to Vercel
+
+Trinetra uses Vercel for the React frontend and a separate public host for the FastAPI service. The backend needs a long-running process and WebSocket support, so it should not be deployed as a static Vercel page.
+
+1. Import this repository into Vercel.
+2. Set the Vercel **Root Directory** to `frontend`.
+3. Keep the default Vite build settings:
+	- Build command: `npm run build`
+	- Output directory: `dist`
+4. Add this production environment variable:
+
+```text
+VITE_API_BASE_URL=https://your-public-backend.example.com
+```
+
+5. Deploy. The value must point to the public FastAPI origin, without a trailing slash. The dashboard will derive the secure WebSocket endpoint automatically at `/ws/telemetry`.
+
+For the backend, use a host that supports persistent WebSockets, then allow the Vercel domain in CORS when moving beyond the current demo configuration.
+
+The local frontend configuration is documented in [frontend/.env.example](frontend/.env.example).
+
 ## Project map
 
 ```text
