@@ -59,8 +59,28 @@ class ConnectionManager:
 
 ws_manager = ConnectionManager()
 
+def calculate_sensor_integrity(telemetry: Dict[str, Any]) -> float:
+    required_metrics = [
+        "temperature",
+        "wind_speed",
+        "humidity",
+        "rainfall",
+        "seismic_activity",
+        "latitude",
+        "longitude",
+    ]
+    valid_metrics = 0
+
+    for metric in required_metrics:
+        value = telemetry.get(metric)
+        if isinstance(value, (int, float)) and value == value:
+            valid_metrics += 1
+
+    return round((valid_metrics / len(required_metrics)) * 100, 1)
+
 # Background telemetry simulation
 async def telemetry_simulation():
+    global LATEST_TELEMETRY
     incident_counter = 1
     log_counter = 1
     
@@ -115,6 +135,7 @@ async def telemetry_simulation():
                 "latitude": weather_snapshot.get("latitude"),
                 "longitude": weather_snapshot.get("longitude"),
             }
+            telemetry["sensor_integrity"] = calculate_sensor_integrity(telemetry)
             LATEST_TELEMETRY = telemetry
             
             # Analyze telemetry

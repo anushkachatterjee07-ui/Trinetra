@@ -32,6 +32,7 @@ type TelemetryData = {
   humidity: number;
   rainfall: number;
   seismic_activity: number;
+  sensor_integrity: number;
   timestamp: string;
 };
 
@@ -207,7 +208,7 @@ export const CommandCenter: React.FC = () => {
   const aiStateClass = latestAnalysis?.detected
     ? 'bg-red-950/60 border-red-700/60 text-red-300'
     : 'bg-sky-950/60 border-sky-700/60 text-sky-300';
-  const envHealthLabel = latestTelemetry ? `${latestTelemetry.humidity}%` : '--';
+  const sensorIntegrityLabel = latestTelemetry ? `${latestTelemetry.sensor_integrity}%` : '--';
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-6 md:py-10 space-y-6">
@@ -279,7 +280,7 @@ export const CommandCenter: React.FC = () => {
             </div>
             <div>
               <div className="text-[10px] uppercase tracking-[0.28em] text-slate-500">Sensor Integrity</div>
-              <div className="mt-2 text-2xl font-black text-white">{envHealthLabel}</div>
+              <div className="mt-2 text-2xl font-black text-white">{sensorIntegrityLabel}</div>
             </div>
           </div>
         </div>
