@@ -178,6 +178,18 @@ For the backend, use a host that supports persistent WebSockets, then allow the 
 
 The local frontend configuration is documented in [frontend/.env.example](frontend/.env.example).
 
+### Deploy the backend to Render
+
+The repository includes [render.yaml](render.yaml), which runs the FastAPI service as a persistent WebSocket-capable web service.
+
+1. Create a new Render Blueprint from this repository.
+2. Select the `render.yaml` configuration.
+3. Deploy the `trinetra-api` service.
+4. Copy the generated Render URL, for example `https://trinetra-api.onrender.com`.
+5. Add that URL to the Vercel project as `VITE_API_BASE_URL` and redeploy the frontend.
+
+The backend health check is available at `/health`, and the live telemetry socket is available at `/ws/telemetry`.
+
 ## Project map
 
 ```text
