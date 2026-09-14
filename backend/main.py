@@ -3,7 +3,7 @@ import json
 import random
 import re
 from contextlib import asynccontextmanager
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Dict, List, Any, Optional
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException, status
@@ -20,6 +20,9 @@ from engines.weather_provider import fetch_west_bengal_weather
 INCIDENTS: Dict[str, DisasterIncident] = {}
 RESOURCES: Dict[str, EmergencyResource] = {}
 LATEST_TELEMETRY: Dict[str, Any] = {}
+
+def utc_now_iso() -> str:
+    return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
 
 # Initialize Mock Resources
 INITIAL_RESOURCES = [
@@ -129,7 +132,7 @@ async def telemetry_simulation():
                 "humidity": round(humidity, 1),
                 "rainfall": round(rainfall, 1),
                 "seismic_activity": round(seismic, 2),
-                "timestamp": datetime.now().isoformat(),
+                "timestamp": utc_now_iso(),
                 "provider": weather_snapshot.get("provider", "fallback-simulation"),
                 "bbox": weather_snapshot.get("bbox"),
                 "latitude": weather_snapshot.get("latitude"),
@@ -166,7 +169,7 @@ async def telemetry_simulation():
                         latitude=weather_snapshot.get("latitude", 22.5726) + random.uniform(-0.01, 0.01),
                         longitude=weather_snapshot.get("longitude", 88.3639) + random.uniform(-0.01, 0.01),
                         status="Active",
-                        timestamp=datetime.now().isoformat(),
+                        timestamp=utc_now_iso(),
                         description=analysis["description"],
                         impact_score=analysis["impact_score"]
                     )
@@ -182,7 +185,7 @@ async def telemetry_simulation():
                         "type": "SYSTEM_LOG",
                         "data": {
                             "id": f"log-{log_counter}",
-                            "timestamp": datetime.now().strftime("%H:%M:%S"),
+                            "timestamp": utc_now_iso(),
                             "level": "ERROR" if incident.severity in ["High", "Critical"] else "WARNING",
                             "message": f"AI Engine generated alert {incident.id}: {incident.type} ({incident.severity}) in {incident.location}!"
                         }
@@ -203,7 +206,7 @@ async def telemetry_simulation():
                     "type": "SYSTEM_LOG",
                     "data": {
                         "id": f"log-{log_counter}",
-                        "timestamp": datetime.now().strftime("%H:%M:%S"),
+                        "timestamp": utc_now_iso(),
                         "level": "INFO",
                         "message": f"Resource {res_to_update.name} ({res_to_update.type}) arrived on-scene at incident {res_to_update.assigned_incident_id}."
                     }
@@ -230,7 +233,7 @@ async def telemetry_simulation():
                             "type": "SYSTEM_LOG",
                             "data": {
                                 "id": f"log-{log_counter}",
-                                "timestamp": datetime.now().strftime("%H:%M:%S"),
+                                "timestamp": utc_now_iso(),
                                 "level": "SUCCESS",
                                 "message": f"Incident {incident.id} ({incident.type}) in {incident.location} has been RESOLVED."
                             }
@@ -247,7 +250,7 @@ async def telemetry_simulation():
                     "type": "SYSTEM_LOG",
                     "data": {
                         "id": f"log-{log_counter}",
-                        "timestamp": datetime.now().strftime("%H:%M:%S"),
+                        "timestamp": utc_now_iso(),
                         "level": "INFO",
                         "message": f"Resource {res_to_free.name} has completed operations and is now AVAILABLE."
                     }
@@ -426,7 +429,7 @@ def get_routing_analysis(prompt: Optional[str] = None):
             "guidance": "Keep arterial routes open for evacuation and reserve alternate corridors for medical support." if is_flood else "Preserve main access corridors and maintain reserve capacity near staging areas.",
             "status": "Operational",
         },
-        "timestamp": datetime.now().isoformat(),
+        "timestamp": utc_now_iso(),
     }
 
 @app.get("/api/ops/evacuation-heatmap")
@@ -451,7 +454,7 @@ def get_evacuation_heatmap():
             active_incidents=active_incidents,
             available_assets=available_assets,
         ),
-        "timestamp": datetime.now().isoformat(),
+        "timestamp": utc_now_iso(),
     }
 
 @app.post("/api/resources/{resource_id}/dispatch")
@@ -480,7 +483,7 @@ async def dispatch_resource(resource_id: str, request: DispatchRequest):
         "type": "SYSTEM_LOG",
         "data": {
             "id": f"dispatch-log-{random.randint(1000, 9999)}",
-            "timestamp": datetime.now().strftime("%H:%M:%S"),
+            "timestamp": utc_now_iso(),
             "level": "WARNING",
             "message": f"DISPATCH COMMAND: {resource.name} is heading to Incident {incident.id} ({incident.type}) in {incident.location}."
         }
@@ -552,7 +555,7 @@ async def websocket_endpoint(websocket: WebSocket):
                         "type": "SYSTEM_LOG",
                         "data": {
                             "id": f"manual-log-{random.randint(1000, 9999)}",
-                            "timestamp": datetime.now().strftime("%H:%M:%S"),
+                            "timestamp": utc_now_iso(),
                             "level": "SUCCESS",
                             "message": f"Incident {inc_id} manually RESOLVED by operator."
                         }

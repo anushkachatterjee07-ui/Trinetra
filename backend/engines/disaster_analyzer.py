@@ -1,9 +1,12 @@
 import random
 import re
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Dict, Any
 
 from engines.weather_provider import WEST_BENGAL_BBOX
+
+def utc_now_iso() -> str:
+    return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
 
 class DisasterAnalyzer:
     """
@@ -228,7 +231,7 @@ class DisasterAnalyzer:
             "latitude": round(lat, 5),
             "longitude": round(lng, 5),
             "status": "Active",
-            "timestamp": datetime.now().isoformat(),
+            "timestamp": utc_now_iso(),
             "description": descriptions[t],
             "impact_score": round(impact, 1)
         }

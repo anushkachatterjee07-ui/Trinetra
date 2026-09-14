@@ -15,6 +15,15 @@ interface RealTimeLogProps {
 export const RealTimeLog: React.FC<RealTimeLogProps> = ({ logs }) => {
   const logEndRef = useRef<HTMLDivElement>(null);
 
+  const formatTimestamp = (timestamp: string) => {
+    if (timestamp === 'System ready' || !timestamp.includes('T')) {
+      return timestamp;
+    }
+
+    const date = new Date(timestamp);
+    return Number.isNaN(date.getTime()) ? timestamp : date.toLocaleTimeString();
+  };
+
   useEffect(() => {
     if (logEndRef.current) {
       logEndRef.current.scrollIntoView({ behavior: 'smooth' });
@@ -53,7 +62,7 @@ export const RealTimeLog: React.FC<RealTimeLogProps> = ({ logs }) => {
         ) : (
           logs.map((log) => (
             <div key={log.id} className="flex items-start gap-2 hover:bg-gray-900/30 p-1 rounded transition">
-              <span className="text-gray-500 select-none">[{log.timestamp}]</span>
+              <span className="text-gray-500 select-none">[{formatTimestamp(log.timestamp)}]</span>
               <span className={`text-[9px] px-1.5 py-0.5 rounded font-bold uppercase ${getLogLevelStyle(log.level)}`}>
                 {log.level}
               </span>

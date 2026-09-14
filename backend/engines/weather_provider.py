@@ -2,7 +2,7 @@ import json
 import random
 import urllib.parse
 import urllib.request
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict, Optional
 
 WEST_BENGAL_LOCATIONS = [
@@ -19,6 +19,9 @@ WEST_BENGAL_BBOX = {
     "west": 85.7,
     "east": 89.8,
 }
+
+def utc_now_iso() -> str:
+    return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
 
 
 def fetch_west_bengal_weather(location_name: Optional[str] = None) -> Dict[str, Any]:
@@ -60,7 +63,7 @@ def fetch_west_bengal_weather(location_name: Optional[str] = None) -> Dict[str, 
             "wind_speed": round(float(wind_speed), 1) if wind_speed is not None else 12.0,
             "rainfall": round(float(rainfall), 1) if rainfall is not None else 0.0,
             "seismic_activity": 0.0,
-            "timestamp": datetime.now().isoformat(),
+            "timestamp": utc_now_iso(),
             "source": "open-meteo",
             "provider": "open-meteo",
             "weather_code": weather_code,
@@ -104,7 +107,7 @@ def fallback_west_bengal_weather(location: Dict[str, Any], reason: Optional[str]
         "wind_speed": round(wind_speed, 1),
         "rainfall": round(rainfall, 1),
         "seismic_activity": 0.0,
-        "timestamp": datetime.now().isoformat(),
+        "timestamp": utc_now_iso(),
         "source": "fallback-simulation",
         "provider": "fallback-simulation",
         "weather_code": None,
